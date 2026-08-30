@@ -1,0 +1,23 @@
+{
+  "frametime": 1,
+  "interpolate": true,
+  "frames": [
+    "sculk",
+    "sculk_1",
+    "sculk_2",
+    "sculk_2",
+    "sculk_3",
+    "sculk_3",
+    "sculk_3",
+    "sculk_4",
+    "sculk_4",
+    "sculk_4",
+    "sculk_4",
+    "sculk_5",
+    "sculk_5",
+    "sculk_5",
+    "sculk_6",
+    "sculk_6",
+    "sculk_7"
+  ]
+}

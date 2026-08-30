@@ -53,8 +53,15 @@ processResources {
             'java_version'                 : java_version
     ]
 
-    var jsonExpandProps = expandProps.collectEntries {
-        key, value -> [(key): value instanceof String ? value.replace('\n', '\\\\n') : value]
+    // JSON-escape string values so fields like `description` may contain quotes, backslashes and
+    // newlines. Order matters: escape backslashes first, then quotes and whitespace.
+    var jsonExpandProps = expandProps.collectEntries { key, value ->
+        [(key): value instanceof String ? value
+                .replace('\\', '\\\\')
+                .replace('"', '\\"')
+                .replace('\n', '\\n')
+                .replace('\r', '\\r')
+                .replace('\t', '\\t') : value]
     }
 
     filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {

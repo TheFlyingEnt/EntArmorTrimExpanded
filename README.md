@@ -1,32 +1,80 @@
-# MultiLoader Template
 
-This project provides a Gradle project template that can compile Minecraft mods for multiple modloaders using a common project for the sources. This project does not require any third party libraries or dependencies. If you have any questions or want to discuss the project, please join our [Discord](https://discord.myceliummod.network).
+![eate_logo](https://cdn.modrinth.com/data/cached_images/1f3801e32d45af631da7e75d57699bac944cd47f.png)
 
-## Getting Started
+#
 
-### IntelliJ IDEA
-This guide will show how to import the MultiLoader Template into IntelliJ IDEA. The setup process is roughly equivalent to setting up the modloaders independently and should be very familiar to anyone who has worked with their MDKs.
 
-1. Clone or download this repository to your computer.
-2. Configure the project by setting the properties in the `gradle.properties` file. You will also need to change the `rootProject.name`  property in `settings.gradle`, this should match the folder name of your project, or else IDEA may complain.
-3. Open the template's root folder as a new project in IDEA. This is the folder that contains this README.md file and the gradlew executable.
-4. If your default JVM/JDK is not Java 25 you will encounter an error when opening the project. This error is fixed by going to `File > Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` and changing the value to a valid Java 25 JVM. You will also need to set the Project SDK to Java 25. This can be done by going to `File > Project Structure > Project SDK`. Once both have been set open the Gradle tab in IDEA and click the refresh button to reload the project.
-5. Open your Run/Debug Configurations. Under the `Application` category there should now be options to run Fabric and NeoForge projects. Select one of the client options and try to run it.
-6. Assuming you were able to run the game in step 5 your workspace should now be set up.
 
-### Eclipse
-While it is possible to use this template in Eclipse it is not recommended. During the development of this template multiple critical bugs and quirks related to Eclipse were found at nearly every level of the required build tools. While we continue to work with these tools to report and resolve issues support for projects like these are not there yet. For now Eclipse is considered unsupported by this project. The development cycle for build tools is notoriously slow so there are no ETAs available.
 
-## Development Guide
-When using this template the majority of your mod should be developed in the `common` project. The `common` project is compiled against the vanilla game and is used to hold code that is shared between the different loader-specific versions of your mod. The `common` project has no knowledge or access to ModLoader specific code, apis, or concepts. Code that requires something from a specific loader must be done through the project that is specific to that loader, such as the `fabric` or `neoforge` projects.
 
-Loader specific projects such as the `fabric` and `neoforge` project are used to load the `common` project into the game. These projects also define code that is specific to that loader. Loader specific projects can access all the code in the `common` project. It is important to remember that the `common` project can not access code from loader specific projects.
+<!-- NeoForge -->
+![NeoForge](https://img.shields.io/badge/NeoForge-FA6A3C?style=for-the-badge&logo=neoforge&logoColor=white)<!-- Fabric -->
+![Fabric](https://img.shields.io/badge/Fabric-DBD0C0?style=for-the-badge&logo=fabric&logoColor=3B3B3B)
 
-## Removing Platforms and Loaders
-While this template has support for many modloaders, new loaders may appear in the future, and existing loaders may become less relevant.
 
-Removing loader specific projects is as easy as deleting the folder, and removing the `include("projectname")` line from the `settings.gradle` file.
-For example if you wanted to remove support for `forge` you would follow the following steps:
+<p align="center"> 
+<b>Addings Support for Animated Armor Trim Material's & Making Them Data-Driven!</b>
 
-1. Delete the subproject folder. For example, delete `MultiLoader-Template/forge`.
-2. Remove the project from `settings.gradle`. For example, remove `include("forge")`. 
+
+
+</p>
+
+
+## What is Adds 
+- **Animated armor trims** — trim colors come alive, cycling frame-by-frame on your armor, in the world, and on the inventory icon.
+- **Glowing trims** — make any trim shine full-bright in the dark (see below).
+- **Fully data-driven** — add your *own* animated trim materials with just a pack. No code (more below).
+- Uses the **real smithing-trim system**, so it works with every trim pattern.
+
+<br>
+
+
+![Anvil GUI showing animated armor trim](https://cdn.modrinth.com/data/cached_images/d61402d94fd959585fe07005c6a78de0927c4ee4.gif)
+*Mod Includes Sculk & Prismarine Armor Time Material
+
+#
+<br>
+<br>
+
+
+## Make Every Armor Trim Glow!
+
+Addings Support for Animated Armor Trim Material's
+
+Drop any **trimmed armor** + a **Glow Ink Sac** into an **anvil** — it's completely **free** (no XP cost). The trim now glows at full-bright, lighting up in caves and at night, and everyone around you sees it too.
+
+![Armor Trim Tooltip with Glowing Added to it](https://cdn.modrinth.com/data/cached_images/4a3b65f4690c5c828c9ecf3c06f4712905f92f2c.png)
+
+
+#
+<br>
+<br>
+
+## Add Your Own Animated Trim Material
+
+The whole animation system is **data-driven**
+With this mod installed, a simple resource + data pack can add a brand-new animated trim material: define your colors and a short animation file, and it just works.
+
+```json
+// assets/<namespace>/trim_animations/<material>.json
+{
+  "frame_time": 90,
+  "frames": ["myfire", "myfire_f1", "myfire_f2", "myfire_f3"]
+}
+```
+### More info & full guide: **[GitHub Docs](https://github.com/TheFlyingEnt/TBA)**
+
+#
+<br>
+<br>
+
+
+<p align="center"> 
+<b>Mod made by TheFlyingEnt aka Ent</b> <br>
+Credits to <a href="https://www.youtube.com/post/UgkxfBCFmbmf2BLZy5sBFpayRvsZNiSFvVIB?lc=Ugzs4rpCUMqv5aapdtZ4AaABAg.Aa0w8gzcQceAa5_pOTuAZe" style="color: white;">Wattles' Community</a>
+
+
+
+</p>
+
+

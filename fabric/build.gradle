@@ -19,6 +19,7 @@ loom {
             setConfigName('Fabric Client')
             ideConfigGenerated(true)
             runDir('runs/client')
+            vmArg('-DMC_DEBUG_DEV_COMMANDS')
         }
         server {
             server()

@@ -18,6 +18,7 @@ neoForge {
         client {
             client()
             gameDirectory = this.mkdir(this.file('runs/client'))
+            jvmArguments.add('-DMC_DEBUG_DEV_COMMANDS')
         }
         data {
             clientData()
@@ -40,6 +41,12 @@ neoForge {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// After ':neoforge:runData', src/generated/resources mirrors files that also ship from :common.
+// Those identical copies would otherwise collide when merged into the jar, so keep the first.
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)

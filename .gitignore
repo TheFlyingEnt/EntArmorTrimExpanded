@@ -22,3 +22,7 @@ build
 eclipse
 run
 runs
+
+# Ent
+*.zip
+wiki-docs/*
