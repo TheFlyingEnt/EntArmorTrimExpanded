@@ -3,5 +3,7 @@
   "description": {
     "color": "#4FB89C",
     "translate": "trim_material.entate.prismarine"
-  }
+  },
+  "ingredient": "minecraft:prismarine_shard",
+  "item_model_index": 0.25
 }

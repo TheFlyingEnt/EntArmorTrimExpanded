@@ -3,5 +3,7 @@
   "description": {
     "color": "#1CE0C8",
     "translate": "trim_material.entate.sculk"
-  }
+  },
+  "ingredient": "minecraft:echo_shard",
+  "item_model_index": 0.15
 }

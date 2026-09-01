@@ -2,14 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.ent.entate.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "MixinAnvilMenu"
   ],
   "client": [
-    "MixinMinecraft",
-    "MixinEquipmentLayerRenderer",
-    "MixinArmorTrim"
+    "MixinMinecraft"
   ],
   "server": [],
   "injectors": {
@@ -19,4 +17,3 @@
     "requireAnnotations": true
   }
 }
-

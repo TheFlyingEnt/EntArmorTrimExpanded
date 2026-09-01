@@ -10,18 +10,29 @@ pluginManagement {
                 }
             }
             filter {
-                includeGroupAndSubgroups('net.fabricmc')
+                includeGroup('net.fabricmc')
+                includeGroup('fabric-loom')
+            }
+        }
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'Sponge'
+                    url = uri('https://repo.spongepowered.org/repository/maven-public')
+                }
+            }
+            filter {
+                includeGroupAndSubgroups("org.spongepowered")
             }
         }
     }
 }
 
 plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
 }
 
 rootProject.name = 'EntSculkTrimMat'
-includeBuild('build-logic')
 include('common')
 include('fabric')
 include('neoforge')

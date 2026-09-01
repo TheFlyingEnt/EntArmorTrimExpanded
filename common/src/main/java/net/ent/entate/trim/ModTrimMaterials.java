@@ -2,9 +2,9 @@ package net.ent.entate.trim;
 
 import net.ent.entate.Constants;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.item.armortrim.TrimMaterial;
 
 public final class ModTrimMaterials {
 
@@ -20,7 +20,7 @@ public final class ModTrimMaterials {
 
     private static ResourceKey<TrimMaterial> key(String path) {
         return ResourceKey.create(Registries.TRIM_MATERIAL,
-                Identifier.fromNamespaceAndPath(Constants.MOD_ID, path));
+                ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, path));
     }
 
     private ModTrimMaterials() {}

@@ -13,6 +13,6 @@ public class MixinMinecraft {
 
     @Inject(at = @At("TAIL"), method = "<init>")
     private void init(CallbackInfo info) {
-        Constants.LOG.info("MC Version: {}", SharedConstants.getCurrentVersion().name());
+        Constants.LOG.info("MC Version: {}", SharedConstants.getCurrentVersion().getName());
     }
 }

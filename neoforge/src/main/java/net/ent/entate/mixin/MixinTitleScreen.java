@@ -14,6 +14,6 @@ public class MixinTitleScreen {
     @Inject(at = @At("HEAD"), method = "init()V")
     private void init(CallbackInfo info) {
 
-        Constants.LOG.info("MC Version: {}", SharedConstants.getCurrentVersion().name());
+        Constants.LOG.info("MC Version: {}", SharedConstants.getCurrentVersion().getName());
     }
 }

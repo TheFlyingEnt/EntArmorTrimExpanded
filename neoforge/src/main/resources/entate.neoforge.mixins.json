@@ -2,10 +2,11 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.ent.entate.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "MixinTitleScreen"
+    "MixinTitleScreen",
+    "MixinHumanoidArmorLayer"
   ],
   "server": [],
   "injectors": {

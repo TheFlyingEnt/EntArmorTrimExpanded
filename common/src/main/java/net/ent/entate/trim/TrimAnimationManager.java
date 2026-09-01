@@ -7,31 +7,30 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import net.ent.entate.Constants;
-import net.ent.entate.trim.TrimAnimation;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 public final class TrimAnimationManager {
 
-    public static final Identifier ID = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "trim_animations");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "trim_animations");
     private static final String DIRECTORY = "trim_animations";
     private static final String SUFFIX = ".json";
 
-    private static volatile Map<Identifier, TrimAnimation> animations = Map.of();
+    private static volatile Map<ResourceLocation, TrimAnimation> animations = Map.of();
 
-    public static TrimAnimation get(Identifier material) {
+    public static TrimAnimation get(ResourceLocation material) {
         return animations.get(material);
     }
 
     public static void reload(ResourceManager resourceManager) {
-        Map<Identifier, TrimAnimation> loaded = new HashMap<>();
-        Map<Identifier, Resource> files =
+        Map<ResourceLocation, TrimAnimation> loaded = new HashMap<>();
+        Map<ResourceLocation, Resource> files =
                 resourceManager.listResources(DIRECTORY, id -> id.getPath().endsWith(SUFFIX));
 
-        for (Map.Entry<Identifier, Resource> entry : files.entrySet()) {
-            Identifier file = entry.getKey();
-            Identifier material = materialIdFromFile(file);
+        for (Map.Entry<ResourceLocation, Resource> entry : files.entrySet()) {
+            ResourceLocation file = entry.getKey();
+            ResourceLocation material = materialIdFromFile(file);
             try (Reader reader = entry.getValue().openAsReader()) {
                 JsonElement json = JsonParser.parseReader(reader);
                 var parsed = TrimAnimation.CODEC.parse(JsonOps.INSTANCE, json);
@@ -50,10 +49,10 @@ public final class TrimAnimationManager {
         Constants.LOG.info("Loaded {} animated trim material(s)", loaded.size());
     }
 
-    private static Identifier materialIdFromFile(Identifier file) {
+    private static ResourceLocation materialIdFromFile(ResourceLocation file) {
         String path = file.getPath();
         String name = path.substring(DIRECTORY.length() + 1, path.length() - SUFFIX.length());
-        return Identifier.fromNamespaceAndPath(file.getNamespace(), name);
+        return ResourceLocation.fromNamespaceAndPath(file.getNamespace(), name);
     }
 
     private TrimAnimationManager() {}
