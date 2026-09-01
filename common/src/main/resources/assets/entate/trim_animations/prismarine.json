@@ -1,5 +1,5 @@
 {
-  "frametime": 6,
+  "frametime": 60,
   "interpolate": true,
   "frames": [
     "prismarine",
