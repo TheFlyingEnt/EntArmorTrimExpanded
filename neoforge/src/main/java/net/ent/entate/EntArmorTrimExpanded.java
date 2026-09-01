@@ -4,12 +4,16 @@ import net.ent.entate.client.EntSculkTrimClient;
 import net.ent.entate.component.ModComponents;
 import net.ent.entate.data.EntSculkTrimDataGen;
 import net.ent.entate.trim.TrimMaterialDefaults;
+import net.ent.entate.trim.TrimProviderManager;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -34,8 +38,20 @@ public class EntArmorTrimExpanded {
 
         eventBus.addListener((GatherDataEvent.Client event) -> EntSculkTrimDataGen.generate(event));
 
+        // Load data-driven trim providers so datapack materials apply in the smithing table.
+        // AddServerReloadListenersEvent is a game-bus event and re-fires on every datapack reload.
+        NeoForge.EVENT_BUS.addListener(EntArmorTrimExpanded::onAddServerReloadListeners);
+
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             EntSculkTrimClient.init(eventBus);
         }
+    }
+
+    @SuppressWarnings("deprecation") // getRegistryAccess() is the reload-fresh access for this MC version
+    private static void onAddServerReloadListeners(AddServerReloadListenersEvent event) {
+        var registries = event.getRegistryAccess();
+        event.addListener(TrimProviderManager.ID,
+                (ResourceManagerReloadListener) resourceManager ->
+                        TrimProviderManager.reload(resourceManager, registries));
     }
 }
