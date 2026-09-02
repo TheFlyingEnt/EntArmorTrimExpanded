@@ -93,7 +93,7 @@ With this mod installed, a simple resource + data pack can add a brand-new anima
   "frames": ["myfire", "myfire_f1", "myfire_f2", "myfire_f3"]
 }
 ```
-### More info & full guide: **[GitHub Docs](https://github.com/TheFlyingEnt/TBA)**
+### More info & full guide: **[GitHub Docs](https://github.com/TheFlyingEnt/EntArmorTrimExpanded/wiki)**
 
 #
 <br>
