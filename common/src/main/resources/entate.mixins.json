@@ -10,7 +10,8 @@
   "client": [
     "MixinMinecraft",
     "MixinEquipmentLayerRenderer",
-    "MixinArmorTrim"
+    "MixinArmorTrim",
+    "MixinClientItemInfoLoader"
   ],
   "server": [],
   "injectors": {

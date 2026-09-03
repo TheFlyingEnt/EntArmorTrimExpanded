@@ -18,16 +18,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 
-/**
- * Loads data-driven "trim provider" mappings so datapacks can make a plain item apply a custom
- * trim material in the smithing table. Vanilla derives the material from the addition item's
- * {@code minecraft:provides_trim_material} component, which a datapack alone cannot set. Each file
- * at {@code data/<namespace>/entate/trim_providers/<name>.json} declares:
- *
- * <pre>{ "item": "minecraft:raw_copper", "material": "example:raw_copper" }</pre>
- *
- * Resolved holders are consulted by {@code MixinSmithingTrimRecipe} when the component is absent.
- */
 public final class TrimProviderManager {
 
     public static final Identifier ID = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "trim_providers");
