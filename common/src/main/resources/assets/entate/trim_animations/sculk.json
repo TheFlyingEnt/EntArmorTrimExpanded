@@ -1,6 +1,7 @@
 {
   "frametime": 1,
   "interpolate": true,
+  "item_model_index": 0.15,
   "frames": [
     "sculk",
     "sculk_1",

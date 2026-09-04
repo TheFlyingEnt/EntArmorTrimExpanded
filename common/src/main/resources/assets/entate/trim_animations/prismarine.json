@@ -1,6 +1,7 @@
 {
   "frametime": 60,
   "interpolate": true,
+  "item_model_index": 0.25,
   "frames": [
     "prismarine",
     "prismarine_1",
