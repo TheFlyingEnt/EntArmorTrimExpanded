@@ -27,19 +27,19 @@
     <tr>
       <td style="padding: 8px 16px;"><b>1.21.1</b></td>
       <td style="padding: 8px 16px;">
-        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/f3enmUAz/entate-fabric-1.21.1-1.0.2.jar?mr_download_reason=standalone&amp;mr_game_version=1.21.1&amp;mr_loader=fabric">Download Fabric</a>
+        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/TXE2wG92/entate-fabric-1.21.1-1.0.3.jar?mr_download_reason=standalone&amp;mr_game_version=1.21.1&amp;mr_loader=fabric">Download Fabric</a>
       </td>
       <td style="padding: 8px 16px;">
-        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/j22R9DGk/entate-neoforge-1.21.1-1.0.2.jar?mr_download_reason=standalone&amp;mr_game_version=1.21.1&amp;mr_loader=neoforge">Download NeoForge</a>
+        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/OSVShddQ/entate-neoforge-1.21.1-1.0.3.jar?mr_download_reason=standalone&amp;mr_game_version=1.21.1&amp;mr_loader=neoforge">Download NeoForge</a>
       </td>
     </tr>
     <tr>
       <td style="padding: 8px 16px;"><b>26.2</b></td>
       <td style="padding: 8px 16px;">
-        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/z9qEwslk/entate-fabric-26.2-1.0.2.jar?mr_download_reason=standalone&amp;mr_game_version=26.2&amp;mr_loader=fabric">Download Fabric</a>
+        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/mS3tiJcT/entate-fabric-26.2-1.0.3.jar?mr_download_reason=standalone&amp;mr_game_version=26.2&amp;mr_loader=fabric">Download Fabric</a>
       </td>
       <td style="padding: 8px 16px;">
-        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/GmnT9XEL/entate-neoforge-26.2-1.0.2.jar?mr_download_reason=standalone&amp;mr_game_version=26.2&amp;mr_loader=neoforge">Download NeoForge</a>
+        <a href="https://cdn.modrinth.com/data/kAcQz9rW/versions/NRJgwgV5/entate-neoforge-26.2-1.0.3.jar?mr_download_reason=standalone&amp;mr_game_version=26.2&amp;mr_loader=neoforge">Download NeoForge</a>
       </td>
     </tr>
   </tbody>
@@ -47,7 +47,7 @@
 
 </p>
 
-> Temporary Download while ![Modrinth Page](https://modrinth.com/mod/ents-armor-trim-expanded) is "Under Review"
+> Temporary Download while [Modrinth Page](https://modrinth.com/mod/ents-armor-trim-expanded) is "Under Review"
 
 ![player-jumping](https://cdn.modrinth.com/data/kAcQz9rW/images/f36985503e0001821fd68cb1b37813fdd3e27e89.gif)
 
