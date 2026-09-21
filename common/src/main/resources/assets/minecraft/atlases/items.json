@@ -2,10 +2,10 @@
   "sources": [
     {
       "type": "minecraft:paletted_permutations",
-      "palette_key": "minecraft:trims/color_palettes/trim_palette",
+      "palette_key": "minecraft:trim_base",
       "permutations": {
-        "prismarine": "entate:trims/color_palettes/prismarine",
-        "sculk": "entate:trims/color_palettes/sculk"
+        "sculk": "entate:trim/sculk",
+        "prismarine": "entate:trim/prismarine"
       },
       "textures": [
         "minecraft:trims/items/helmet_trim",

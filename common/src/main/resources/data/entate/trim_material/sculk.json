@@ -1,5 +1,5 @@
 {
-  "asset_name": "sculk",
+  "palette_id": "entate:trim/sculk",
   "description": {
     "color": "#1CE0C8",
     "translate": "trim_material.entate.sculk"

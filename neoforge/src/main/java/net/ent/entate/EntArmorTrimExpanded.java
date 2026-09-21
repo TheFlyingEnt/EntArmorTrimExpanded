@@ -38,8 +38,6 @@ public class EntArmorTrimExpanded {
 
         eventBus.addListener((GatherDataEvent.Client event) -> EntSculkTrimDataGen.generate(event));
 
-        // Load data-driven trim providers so datapack materials apply in the smithing table.
-        // AddServerReloadListenersEvent is a game-bus event and re-fires on every datapack reload.
         NeoForge.EVENT_BUS.addListener(EntArmorTrimExpanded::onAddServerReloadListeners);
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
@@ -47,7 +45,7 @@ public class EntArmorTrimExpanded {
         }
     }
 
-    @SuppressWarnings("deprecation") // getRegistryAccess() is the reload-fresh access for this MC version
+    @SuppressWarnings("deprecation")
     private static void onAddServerReloadListeners(AddServerReloadListenersEvent event) {
         var registries = event.getRegistryAccess();
         event.addListener(TrimProviderManager.ID,

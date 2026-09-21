@@ -100,6 +100,14 @@ public class MixinClientItemInfoLoader {
             if (resourceManager.getResourceStack(overlayResource).isEmpty()) {
                 continue;
             }
+
+            Identifier palette = Identifier.fromNamespaceAndPath(
+                    material.getNamespace(), "textures/palettes/trim/" + material.getPath() + ".png");
+            if (resourceManager.getResourceStack(palette).isEmpty()) {
+                Constants.LOG.warn("Skipping trim-material icon for {}: no 26.3 palette at {} (outdated pack?)",
+                        material, palette);
+                continue;
+            }
             ItemModel.Unbaked overlay = new CuboidItemModelWrapper.Unbaked(overlayModel, Optional.empty(), List.of());
             cases.add(new SelectItemModel.SwitchCase(List.of(key), overlay));
             changed = true;

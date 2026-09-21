@@ -9,9 +9,9 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 import net.neoforged.neoforge.common.data.ItemTagsProvider;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -23,13 +23,13 @@ public final class EntSculkTrimDataGen {
         RegistrySetBuilder registries = new RegistrySetBuilder()
                 .add(Registries.TRIM_MATERIAL, ctx -> {
                     ctx.register(ModTrimMaterials.SCULK, new TrimMaterial(
-                            MaterialAssetGroup.create("sculk"),
+                            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "trim/sculk"),
                             Component.translatable("trim_material.entate.sculk").withColor(0x1CE0C8)));
                     ctx.register(ModTrimMaterials.PRISMARINE, new TrimMaterial(
-                            MaterialAssetGroup.create("prismarine"),
+                            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "trim/prismarine"),
                             Component.translatable("trim_material.entate.prismarine").withColor(0x4FB89C)));
                 });
-        event.createDatapackRegistryObjects(registries, Set.of(Constants.MOD_ID));
+        event.createReloadableRegistryObjects(registries, Set.of(Constants.MOD_ID));
 
         event.createProvider((PackOutput output, CompletableFuture<HolderLookup.Provider> lookup) ->
                 new ItemTagsProvider(output, lookup, Constants.MOD_ID) {

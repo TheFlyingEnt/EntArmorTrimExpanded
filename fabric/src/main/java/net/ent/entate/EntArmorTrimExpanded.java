@@ -26,7 +26,6 @@ public class EntArmorTrimExpanded implements ModInitializer {
             }
         });
 
-        // Load data-driven trim providers so datapack materials apply in the smithing table.
         ServerLifecycleEvents.SERVER_STARTING.register(server ->
                 TrimProviderManager.reload(server.getResourceManager(), server.registryAccess()));
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) ->

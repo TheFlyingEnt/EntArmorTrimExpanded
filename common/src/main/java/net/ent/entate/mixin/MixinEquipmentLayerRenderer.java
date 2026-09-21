@@ -2,20 +2,19 @@ package net.ent.entate.mixin;
 
 import java.util.function.Function;
 import net.ent.entate.component.ModComponents;
+import net.ent.entate.trim.EntateTrimRenderTypes;
 import net.ent.entate.trim.TrimAnimation;
 import net.ent.entate.trim.TrimAnimationManager;
+import net.ent.entate.trim.TrimRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.EquipmentAssetManager;
 import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.client.resources.palette.PalettedTextureManager;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -43,68 +42,76 @@ public class MixinEquipmentLayerRenderer {
 
     @Unique
     private static final String entate$SUBMIT_MODEL =
-            "Lnet/minecraft/client/renderer/OrderedSubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V";
+            "Lnet/minecraft/client/renderer/OrderedSubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/UvMapping;I)V";
 
     @Unique
-    private TextureAtlas entate$trimAtlas;
+    private PalettedTextureManager entate$paletteManager;
+
+    @Unique
+    private ItemStack entate$stack;
 
     @Unique
     private boolean entate$glowing;
 
+    @Unique
+    private Identifier entate$baseTexture;
+
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void entate$captureAtlas(EquipmentAssetManager equipmentAssets, TextureAtlas armorTrimAtlas, CallbackInfo ci) {
-        this.entate$trimAtlas = armorTrimAtlas;
+    private void entate$captureManager(EquipmentAssetManager equipmentAssets, PalettedTextureManager paletteManager, CallbackInfo ci) {
+        this.entate$paletteManager = paletteManager;
     }
 
-    @Unique
-    private TextureAtlasSprite entate$frameSprite(Identifier baseName, String baseFrame, String targetFrame) {
-        String basePath = baseName.getPath();
-        if (!basePath.endsWith(baseFrame)) {
-            return null;
-        }
-        Identifier frameName = baseName.withPath(
-                basePath.substring(0, basePath.length() - baseFrame.length()) + targetFrame);
-        TextureAtlasSprite frameSprite = this.entate$trimAtlas.getSprite(frameName);
-        return (frameSprite != null && frameName.equals(frameSprite.contents().name())) ? frameSprite : null;
+    @Inject(method = entate$RENDER_LAYERS, at = @At("HEAD"))
+    private void entate$captureState(EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId,
+            Model<?> model, Object state, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector,
+            int lightCoords, Identifier playerTextureOverride, int outlineColor, int order, CallbackInfo ci) {
+        this.entate$stack = itemStack;
+        this.entate$glowing = itemStack != null && itemStack.getOrDefault(ModComponents.GLOWING_TRIM, Boolean.FALSE);
+        this.entate$baseTexture = null;
     }
 
     @Redirect(
             method = entate$RENDER_LAYERS,
             at = @At(value = "INVOKE", target = "Ljava/util/function/Function;apply(Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1)
     )
-    private Object entate$animateTrimSprite(Function<Object, Object> trimSpriteLookup, Object key, EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId, Model<?> model, Object state, ItemStack itemStack) {
-        TextureAtlasSprite sprite = (TextureAtlasSprite) trimSpriteLookup.apply(key);
+    private Object entate$animateTrimHandle(Function<Object, Object> trimLookup, Object trimTextureKey) {
+        Object handle = trimLookup.apply(trimTextureKey);
 
-        this.entate$glowing = itemStack != null
-                && itemStack.getOrDefault(ModComponents.GLOWING_TRIM, Boolean.FALSE);
+        this.entate$baseTexture = TrimRenderState.getBaseTexture(trimTextureKey);
 
-        if (itemStack == null || this.entate$trimAtlas == null) {
-            return sprite;
+        ItemStack itemStack = this.entate$stack;
+        if (itemStack == null || this.entate$paletteManager == null) {
+            return handle;
         }
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) {
-            return sprite;
+            return handle;
         }
+
         ResourceKey<TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
         if (materialKey == null) {
-            return sprite;
+            return handle;
         }
         TrimAnimation animation = TrimAnimationManager.get(materialKey.identifier());
         if (animation == null || animation.isEmpty()) {
-            return sprite;
+            return handle;
         }
 
-        String targetFrame = animation.frameAt(System.currentTimeMillis());
-        if (targetFrame.equals(animation.baseFrame())) {
-            return sprite;
+        String frame = animation.frameAt(System.currentTimeMillis());
+        if (frame.equals(animation.baseFrame()) || this.entate$baseTexture == null) {
+            return handle;
         }
-        TextureAtlasSprite frameSprite = entate$frameSprite(sprite.contents().name(), animation.baseFrame(), targetFrame);
-        return frameSprite != null ? frameSprite : sprite;
+        Identifier framePalette =
+                TrimRenderState.framePalette(trim.material().value().paletteId(), animation.baseFrame(), frame);
+        if (framePalette == null) {
+            return handle;
+        }
+        return this.entate$paletteManager.getOrPrepare(this.entate$baseTexture, framePalette);
     }
 
     @ModifyArg(
             method = entate$RENDER_LAYERS,
-            at = @At(value = "INVOKE", target = entate$SUBMIT_MODEL, ordinal = 2),
+            at = @At(value = "INVOKE", target = entate$SUBMIT_MODEL, ordinal = 1),
             index = 4
     )
     private int entate$glowTrimLight(int lightCoords) {
@@ -113,11 +120,13 @@ public class MixinEquipmentLayerRenderer {
 
     @Inject(
             method = entate$RENDER_LAYERS,
-            at = @At(value = "INVOKE", target = entate$SUBMIT_MODEL, ordinal = 2, shift = At.Shift.AFTER)
+            at = @At(value = "INVOKE", target = entate$SUBMIT_MODEL, ordinal = 1, shift = At.Shift.AFTER)
     )
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private void entate$interpolateTrim(EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId, Model model, Object state, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, Identifier playerTextureOverride, int outlineColor, int order, CallbackInfo ci) {
-        if (itemStack == null || this.entate$trimAtlas == null) {
+    private void entate$interpolateTrim(EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId,
+            Model model, Object state, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector,
+            int lightCoords, Identifier playerTextureOverride, int outlineColor, int order, CallbackInfo ci) {
+        if (itemStack == null || this.entate$paletteManager == null || this.entate$baseTexture == null) {
             return;
         }
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
@@ -142,17 +151,18 @@ public class MixinEquipmentLayerRenderer {
         if (blend <= 0.0F) {
             return;
         }
-
-        Identifier baseSpriteId = trim.layerAssetId(layerType.trimAssetPrefix(), equipmentAssetId);
-        TextureAtlasSprite nextSprite = entate$frameSprite(baseSpriteId, animation.baseFrame(), nextFrame);
-        if (nextSprite == null) {
+        Identifier nextPalette =
+                TrimRenderState.framePalette(trim.material().value().paletteId(), animation.baseFrame(), nextFrame);
+        if (nextPalette == null) {
             return;
         }
 
+        PalettedTextureManager.Handle nextHandle = this.entate$paletteManager.getOrPrepare(this.entate$baseTexture, nextPalette);
         int light = this.entate$glowing ? entate$FULL_BRIGHT : lightCoords;
         int fadeColor = (Math.round(blend * 255.0F) << 24) | 0x00FFFFFF;
-        RenderType renderType = RenderTypes.armorTranslucent(nextSprite.atlasLocation());
+
+        RenderType renderType = EntateTrimRenderTypes.interpolate(nextHandle.textureLocation());
         submitNodeCollector.order(order + 4096).submitModel(model, state, poseStack, renderType, light,
-                OverlayTexture.NO_OVERLAY, fadeColor, nextSprite, outlineColor, (ModelFeatureRenderer.CrumblingOverlay) null);
+                OverlayTexture.NO_OVERLAY, fadeColor, nextHandle, outlineColor);
     }
 }
