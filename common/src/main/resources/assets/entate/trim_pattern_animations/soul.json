@@ -1,0 +1,15 @@
+{
+  "frametime": 4,
+  "interpolate": true,
+  "frames": [
+    "coast",
+    "soul_1",
+    "soul_2",
+    "soul_3",
+    "soul_4",
+    "soul_5",
+    "soul_6",
+    "soul_7",
+    "soul_1"
+  ]
+}

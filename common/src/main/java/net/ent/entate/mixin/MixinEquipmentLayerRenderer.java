@@ -5,6 +5,7 @@ import net.ent.entate.component.ModComponents;
 import net.ent.entate.trim.EntateTrimRenderTypes;
 import net.ent.entate.trim.TrimAnimation;
 import net.ent.entate.trim.TrimAnimationManager;
+import net.ent.entate.trim.TrimPatternAnimationManager;
 import net.ent.entate.trim.TrimRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.Model;
@@ -22,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -80,33 +82,91 @@ public class MixinEquipmentLayerRenderer {
         this.entate$baseTexture = TrimRenderState.getBaseTexture(trimTextureKey);
 
         ItemStack itemStack = this.entate$stack;
-        if (itemStack == null || this.entate$paletteManager == null) {
+        if (itemStack == null || this.entate$paletteManager == null || this.entate$baseTexture == null) {
             return handle;
         }
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) {
             return handle;
         }
+        Identifier palette = trim.material().value().paletteId();
+        if (palette == null) {
+            return handle;
+        }
+
+        long now = System.currentTimeMillis();
+        Identifier base = this.entate$baseTexture;
+        boolean changed = false;
 
         ResourceKey<TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
-        if (materialKey == null) {
-            return handle;
-        }
-        TrimAnimation animation = TrimAnimationManager.get(materialKey.identifier());
-        if (animation == null || animation.isEmpty()) {
-            return handle;
+        if (materialKey != null) {
+            Identifier swapped = entate$paletteFrame(
+                    TrimAnimationManager.get(materialKey.identifier()), palette, now);
+            if (swapped != palette) {
+                palette = swapped;
+                changed = true;
+            }
         }
 
-        String frame = animation.frameAt(System.currentTimeMillis());
-        if (frame.equals(animation.baseFrame()) || this.entate$baseTexture == null) {
+        ResourceKey<TrimPattern> patternKey = trim.pattern().unwrapKey().orElse(null);
+        if (patternKey != null) {
+            Identifier swapped = entate$baseFrame(
+                    TrimPatternAnimationManager.get(patternKey.identifier()), base, now);
+            if (!swapped.equals(base)) {
+                base = swapped;
+                changed = true;
+            }
+        }
+
+        if (!changed) {
             return handle;
         }
-        Identifier framePalette =
-                TrimRenderState.framePalette(trim.material().value().paletteId(), animation.baseFrame(), frame);
-        if (framePalette == null) {
-            return handle;
+        return this.entate$paletteManager.getOrPrepare(base, palette);
+    }
+
+    @Unique
+    private static Identifier entate$paletteFrame(TrimAnimation animation, Identifier original, long now) {
+        if (animation == null || animation.isEmpty()) {
+            return original;
         }
-        return this.entate$paletteManager.getOrPrepare(this.entate$baseTexture, framePalette);
+        String frame = animation.frameAt(now);
+        if (frame.equals(animation.baseFrame())) {
+            return original;
+        }
+        Identifier swapped = TrimRenderState.frameTexture(original, animation.baseFrame(), frame);
+        return swapped != null ? swapped : original;
+    }
+
+    @Unique
+    private static Identifier entate$nextPaletteFrame(TrimAnimation animation, Identifier original, long now) {
+        if (animation == null || animation.isEmpty() || !animation.interpolate()) {
+            return null;
+        }
+        String nextFrame = animation.nextFrameAt(now);
+        if (nextFrame.equals(animation.frameAt(now))) {
+            return null;
+        }
+        return TrimRenderState.frameTexture(original, animation.baseFrame(), nextFrame);
+    }
+
+    @Unique
+    private static Identifier entate$baseFrame(TrimAnimation animation, Identifier original, long now) {
+        if (animation == null || animation.isEmpty()) {
+            return original;
+        }
+        return TrimRenderState.frameBaseTexture(original, animation.frameAt(now));
+    }
+
+    @Unique
+    private static Identifier entate$nextBaseFrame(TrimAnimation animation, Identifier original, long now) {
+        if (animation == null || animation.isEmpty() || !animation.interpolate()) {
+            return null;
+        }
+        String nextFrame = animation.nextFrameAt(now);
+        if (nextFrame.equals(animation.frameAt(now))) {
+            return null;
+        }
+        return TrimRenderState.frameBaseTexture(original, nextFrame);
     }
 
     @ModifyArg(
@@ -133,31 +193,41 @@ public class MixinEquipmentLayerRenderer {
         if (trim == null) {
             return;
         }
+        Identifier origPalette = trim.material().value().paletteId();
+        if (origPalette == null) {
+            return;
+        }
+        Identifier origBase = this.entate$baseTexture;
+
         ResourceKey<TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
-        if (materialKey == null) {
-            return;
-        }
-        TrimAnimation animation = TrimAnimationManager.get(materialKey.identifier());
-        if (animation == null || animation.isEmpty() || !animation.interpolate()) {
-            return;
-        }
+        ResourceKey<TrimPattern> patternKey = trim.pattern().unwrapKey().orElse(null);
+        TrimAnimation materialAnim = materialKey != null ? TrimAnimationManager.get(materialKey.identifier()) : null;
+        TrimAnimation patternAnim = patternKey != null ? TrimPatternAnimationManager.get(patternKey.identifier()) : null;
 
         long now = System.currentTimeMillis();
-        String nextFrame = animation.nextFrameAt(now);
-        if (nextFrame.equals(animation.frameAt(now))) {
-            return;
+
+        Identifier toPalette = entate$paletteFrame(materialAnim, origPalette, now);
+        Identifier toBase = entate$baseFrame(patternAnim, origBase, now);
+        float blend = 0.0F;
+        boolean active = false;
+
+        Identifier nextPalette = entate$nextPaletteFrame(materialAnim, origPalette, now);
+        if (nextPalette != null) {
+            toPalette = nextPalette;
+            blend = Math.max(blend, materialAnim.blendFactor(now));
+            active = true;
         }
-        float blend = animation.blendFactor(now);
-        if (blend <= 0.0F) {
-            return;
+        Identifier nextBase = entate$nextBaseFrame(patternAnim, origBase, now);
+        if (nextBase != null) {
+            toBase = nextBase;
+            blend = Math.max(blend, patternAnim.blendFactor(now));
+            active = true;
         }
-        Identifier nextPalette =
-                TrimRenderState.framePalette(trim.material().value().paletteId(), animation.baseFrame(), nextFrame);
-        if (nextPalette == null) {
+        if (!active || blend <= 0.0F) {
             return;
         }
 
-        PalettedTextureManager.Handle nextHandle = this.entate$paletteManager.getOrPrepare(this.entate$baseTexture, nextPalette);
+        PalettedTextureManager.Handle nextHandle = this.entate$paletteManager.getOrPrepare(toBase, toPalette);
         int light = this.entate$glowing ? entate$FULL_BRIGHT : lightCoords;
         int fadeColor = (Math.round(blend * 255.0F) << 24) | 0x00FFFFFF;
 
