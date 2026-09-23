@@ -56,6 +56,7 @@ public final class EntSculkTrimDataGen {
                         add("trim_material.entate.sculk", "Sculk Material");
                         add("trim_material.entate.prismarine", "Prismarine Material");
                         add("trim_pattern.entate.soul", "Soul");
+                        add("item.entate.soul_armor_trim_smithing_template", "Soul Armor Trim Smithing Template");
                     }
                 });
     }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "S": "minecraft:soul_sand",
+    "E": "minecraft:echo_shard"
+  },
+  "pattern": [
+    "GSG",
+    "SES",
+    "GSG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "entate:soul_armor_trim_smithing_template"
+  }
+}
