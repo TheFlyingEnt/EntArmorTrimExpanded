@@ -17,5 +17,14 @@ public final class ModComponents {
                     .networkSynchronized(ByteBufCodecs.BOOL)
                     .build();
 
+    public static final Identifier TRIM_PATTERN_ID =
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "trim_pattern");
+
+    public static final DataComponentType<Identifier> TRIM_PATTERN =
+            DataComponentType.<Identifier>builder()
+                    .persistent(Identifier.CODEC)
+                    .networkSynchronized(Identifier.STREAM_CODEC)
+                    .build();
+
     private ModComponents() {}
 }

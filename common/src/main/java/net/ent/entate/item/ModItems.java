@@ -1,5 +1,6 @@
 package net.ent.entate.item;
 
+import java.util.Set;
 import net.ent.entate.Constants;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -14,10 +15,20 @@ public final class ModItems {
     public static final ResourceKey<Item> SOUL_ARMOR_TRIM_SMITHING_TEMPLATE =
             key("soul_armor_trim_smithing_template");
 
+    public static final ResourceKey<Item> CUSTOM_SMITHING_TEMPLATE =
+            key("custom_smithing_template");
+
     public static final ResourceKey<CreativeModeTab> INGREDIENTS_TAB = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath("minecraft", "ingredients"));
 
+    public static final Set<Identifier> DEDICATED_PATTERNS = Set.of(
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "soul"));
+
     public static Item createSoulArmorTrimTemplate(Item.Properties properties) {
+        return SmithingTemplateItem.createArmorTrimTemplate(properties.rarity(Rarity.UNCOMMON));
+    }
+
+    public static Item createCustomSmithingTemplate(Item.Properties properties) {
         return SmithingTemplateItem.createArmorTrimTemplate(properties.rarity(Rarity.UNCOMMON));
     }
 

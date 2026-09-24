@@ -13,6 +13,7 @@
     "MixinTrimTextureKey",
     "MixinArmorTrim",
     "MixinClientItemInfoLoader",
+    "MixinCustomTemplateName",
     "RenderTypeAccessor"
   ],
   "server": [],

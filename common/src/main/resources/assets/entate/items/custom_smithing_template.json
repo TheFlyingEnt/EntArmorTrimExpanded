@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "entate:item/custom_smithing_template"
+  }
+}

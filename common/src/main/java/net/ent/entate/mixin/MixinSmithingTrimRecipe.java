@@ -1,12 +1,19 @@
 package net.ent.entate.mixin;
 
+import net.ent.entate.component.ModComponents;
 import net.ent.entate.trim.TrimProviderManager;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.SmithingRecipeInput;
 import net.minecraft.world.item.crafting.SmithingTrimRecipe;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SmithingTrimRecipe.class)
 public class MixinSmithingTrimRecipe {
@@ -22,5 +29,22 @@ public class MixinSmithingTrimRecipe {
     private static Object entate$provideTrimMaterial(ItemStack addition, DataComponentType<?> componentType) {
         Object provided = addition.get(componentType);
         return provided != null ? provided : TrimProviderManager.getHolder(addition.getItem());
+    }
+
+    @Inject(
+            method = "assemble(Lnet/minecraft/world/item/crafting/SmithingRecipeInput;)Lnet/minecraft/world/item/ItemStack;",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void entate$applyComponentPattern(SmithingRecipeInput input, CallbackInfoReturnable<ItemStack> cir) {
+        Identifier patternId = input.template().get(ModComponents.TRIM_PATTERN);
+        if (patternId == null) {
+            return;
+        }
+        Holder<TrimPattern> pattern = TrimProviderManager.getPattern(patternId);
+        if (pattern == null) {
+            return;
+        }
+        cir.setReturnValue(SmithingTrimRecipe.applyTrim(input.base(), input.addition(), pattern));
     }
 }

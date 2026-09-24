@@ -1,5 +1,6 @@
 package net.ent.entate;
 
+import net.ent.entate.trim.CustomTemplateManager;
 import net.ent.entate.trim.TrimAnimationManager;
 import net.ent.entate.trim.TrimPatternAnimationManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -13,5 +14,6 @@ public class EntArmorTrimExpandedClient implements ClientModInitializer {
     public void onInitializeClient() {
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(TrimAnimationManager.ID, (ResourceManagerReloadListener) TrimAnimationManager::reload);
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(TrimPatternAnimationManager.ID, (ResourceManagerReloadListener) TrimPatternAnimationManager::reload);
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(CustomTemplateManager.ID, (ResourceManagerReloadListener) CustomTemplateManager::reload);
     }
 }

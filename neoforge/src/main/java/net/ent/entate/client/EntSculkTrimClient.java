@@ -1,5 +1,6 @@
 package net.ent.entate.client;
 
+import net.ent.entate.trim.CustomTemplateManager;
 import net.ent.entate.trim.TrimAnimationManager;
 import net.ent.entate.trim.TrimPatternAnimationManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -15,6 +16,8 @@ public final class EntSculkTrimClient {
                 (ResourceManagerReloadListener) TrimAnimationManager::reload);
             event.addListener(TrimPatternAnimationManager.ID,
                 (ResourceManagerReloadListener) TrimPatternAnimationManager::reload);
+            event.addListener(CustomTemplateManager.ID,
+                (ResourceManagerReloadListener) CustomTemplateManager::reload);
         });
     }
 

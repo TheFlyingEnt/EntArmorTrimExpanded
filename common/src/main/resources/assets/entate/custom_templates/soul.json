@@ -1,0 +1,5 @@
+{
+  "pattern": "entate:soul",
+  "name": "Soul Armor Trim Smithing Template",
+  "model": "entate:item/soul_custom_template"
+}

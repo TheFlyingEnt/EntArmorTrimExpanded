@@ -10,10 +10,15 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import net.ent.entate.Constants;
+import net.ent.entate.component.ModComponents;
+import net.ent.entate.item.ModItems;
+import net.ent.entate.trim.CustomTemplate;
+import net.ent.entate.trim.CustomTemplateManager;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.CuboidItemModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
+import net.minecraft.client.renderer.item.properties.select.ComponentContents;
 import net.minecraft.client.renderer.item.properties.select.TrimMaterialProperty;
 import net.minecraft.client.resources.model.ClientItemInfoLoader;
 import net.minecraft.core.registries.Registries;
@@ -41,28 +46,71 @@ public class MixinClientItemInfoLoader {
     private static ClientItemInfoLoader.LoadedClientInfos entate$augment(
             ClientItemInfoLoader.LoadedClientInfos infos, ResourceManager resourceManager) {
         try {
-            List<Identifier> materials = entate$discoverMaterials(resourceManager);
-            if (materials.isEmpty()) {
-                return infos;
-            }
             Map<Identifier, ClientItem> out = new HashMap<>(infos.contents());
-            int added = 0;
-            for (Map.Entry<Identifier, ClientItem> entry : infos.contents().entrySet()) {
-                ClientItem augmented = entate$augmentItem(entry.getKey(), entry.getValue(), materials, resourceManager);
-                if (augmented != null) {
-                    out.put(entry.getKey(), augmented);
-                    added++;
+            boolean changed = false;
+
+            List<Identifier> materials = entate$discoverMaterials(resourceManager);
+            if (!materials.isEmpty()) {
+                int added = 0;
+                for (Map.Entry<Identifier, ClientItem> entry : infos.contents().entrySet()) {
+                    ClientItem augmented = entate$augmentItem(entry.getKey(), entry.getValue(), materials, resourceManager);
+                    if (augmented != null) {
+                        out.put(entry.getKey(), augmented);
+                        added++;
+                    }
+                }
+                if (added > 0) {
+                    Constants.LOG.info("Injected trim-material icon cases into {} armor item(s)", added);
+                    changed = true;
                 }
             }
-            if (added > 0) {
-                Constants.LOG.info("Injected trim-material icon cases into {} armor item(s)", added);
-                return new ClientItemInfoLoader.LoadedClientInfos(out);
+
+            Identifier customId = ModItems.CUSTOM_SMITHING_TEMPLATE.identifier();
+            ClientItem custom = out.get(customId);
+            if (custom != null) {
+                ClientItem built = entate$buildCustomTemplate(custom, resourceManager);
+                if (built != null) {
+                    out.put(customId, built);
+                    changed = true;
+                }
             }
-            return infos;
+
+            return changed ? new ClientItemInfoLoader.LoadedClientInfos(out) : infos;
         } catch (Exception e) {
             Constants.LOG.error("Failed to inject trim-material icon cases", e);
             return infos;
         }
+    }
+
+    @Unique
+    private static ClientItem entate$buildCustomTemplate(ClientItem item, ResourceManager resourceManager) {
+        Map<Identifier, CustomTemplate> templates = CustomTemplateManager.load(resourceManager);
+        if (templates.isEmpty()) {
+            return null;
+        }
+        List<SelectItemModel.SwitchCase<Identifier>> cases = new ArrayList<>();
+        for (CustomTemplate template : templates.values()) {
+            Identifier modelResource = Identifier.fromNamespaceAndPath(
+                    template.model().getNamespace(), "models/" + template.model().getPath() + ".json");
+            if (resourceManager.getResourceStack(modelResource).isEmpty()) {
+                Constants.LOG.warn("Skipping custom template for {}: missing item model {}",
+                        template.pattern(), template.model());
+                continue;
+            }
+            ItemModel.Unbaked model =
+                    new CuboidItemModelWrapper.Unbaked(template.model(), Optional.empty(), List.of());
+            cases.add(new SelectItemModel.SwitchCase<>(List.of(template.pattern()), model));
+        }
+        if (cases.isEmpty()) {
+            return null;
+        }
+        ComponentContents<Identifier> property = new ComponentContents<>(ModComponents.TRIM_PATTERN);
+        SelectItemModel.UnbakedSwitch<ComponentContents<Identifier>, Identifier> unbakedSwitch =
+                new SelectItemModel.UnbakedSwitch<>(property, cases);
+        SelectItemModel.Unbaked selectModel =
+                new SelectItemModel.Unbaked(Optional.empty(), unbakedSwitch, Optional.of(item.model()));
+        Constants.LOG.info("Built custom smithing template model with {} pattern case(s)", cases.size());
+        return new ClientItem(selectModel, item.properties(), item.registrySwapper());
     }
 
     @Unique

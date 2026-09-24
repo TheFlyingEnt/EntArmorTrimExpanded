@@ -17,6 +17,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
 
 public final class TrimProviderManager {
 
@@ -25,6 +26,7 @@ public final class TrimProviderManager {
     private static final String SUFFIX = ".json";
 
     private static volatile Map<Item, Holder<TrimMaterial>> providers = Map.of();
+    private static volatile HolderLookup.RegistryLookup<TrimPattern> patterns;
 
     private TrimProviderManager() {}
 
@@ -32,7 +34,16 @@ public final class TrimProviderManager {
         return providers.get(item);
     }
 
+    public static Holder<TrimPattern> getPattern(Identifier pattern) {
+        HolderLookup.RegistryLookup<TrimPattern> lookup = patterns;
+        if (lookup == null) {
+            return null;
+        }
+        return lookup.get(ResourceKey.create(Registries.TRIM_PATTERN, pattern)).orElse(null);
+    }
+
     public static void reload(ResourceManager resourceManager, HolderLookup.Provider registries) {
+        patterns = registries.lookupOrThrow(Registries.TRIM_PATTERN);
         HolderLookup.RegistryLookup<TrimMaterial> materials =
                 registries.lookupOrThrow(Registries.TRIM_MATERIAL);
 
